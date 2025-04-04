@@ -1,9 +1,12 @@
 import { extensionManifestSchema } from '../src/schema';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { writeFile } from 'fs/promises';
-import { resolve } from 'path';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-const __dirname = new URL('.', import.meta.url).pathname;
+// Properly derive __dirname on all platforms
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const rootDir = resolve(__dirname, '..');
 
 const jsonSchema = zodToJsonSchema(extensionManifestSchema, {
@@ -12,5 +15,7 @@ const jsonSchema = zodToJsonSchema(extensionManifestSchema, {
 });
 
 (async () => {
-	await writeFile(resolve(rootDir, 'schema.json'), JSON.stringify(jsonSchema, null, 2));
+	const outputPath = resolve(rootDir, 'schema.json');
+	console.log('Writing to:', outputPath); // Debug the path
+	await writeFile(outputPath, JSON.stringify(jsonSchema, null, 2));
 })();
